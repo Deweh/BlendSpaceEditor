@@ -1,0 +1,17 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "name": "blendspaceeditor",
+  "version-string": "1.0.0",
+  "description": "-",
+  "builtin-baseline": "1de2026f28ead93ff1773e6e680387643e914ea1",
+  "homepage": "https://github.com/Deweh/BlendSpaceEditor",
+  "dependencies": [
+    {
+      "name": "imgui",
+      "features": [ "opengl3-binding", "win32-binding" ]
+    },
+    "imgui-node-editor",
+    "opengl",
+    "nlohmann-json"
+  ]
+}
