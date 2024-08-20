@@ -12,7 +12,15 @@ endif()
 project ("BlendSpaceEditor")
 
 # Add source to this project's executable.
-add_executable (BlendSpaceEditor "BlendSpaceEditor.cpp"  vcpkg.json "BlendSpaceEditor/Main.cpp" "BlendSpaceEditor/Editor.h" "BlendSpaceEditor/Editor.cpp" "BlendSpaceEditor/ImUtil.h" "BlendSpaceEditor/Drawing.h" "BlendSpaceEditor/NodeBuilder.h" "BlendSpaceEditor/NodeBuilder.cpp" "BlendSpaceEditor/Drawing.cpp" "BlendSpaceEditor/ImUtil.cpp" "BlendSpaceEditor/Nodes/NodeDefinitions.h" "BlendSpaceEditor/Nodes/NodeTypes.h" "BlendSpaceEditor/Nodes/NodeDefinitions.cpp" "BlendSpaceEditor/Serialization/JSON.h" "BlendSpaceEditor/Serialization/JSON.cpp" "BlendSpaceEditor/Nodes/NodeTypes.cpp" "BlendSpaceEditor/Win32Util.h")
+add_executable (BlendSpaceEditor vcpkg.json
+ "BlendSpaceEditor.cpp"
+ "BlendSpaceEditor/Main.cpp"
+ "BlendSpaceEditor/Editor.cpp"
+ "BlendSpaceEditor/NodeBuilder.cpp"
+ "BlendSpaceEditor/Drawing.cpp"
+ "BlendSpaceEditor/ImUtil.cpp"
+ "BlendSpaceEditor/Nodes/NodeDefinitions.cpp"
+ "BlendSpaceEditor/Nodes/NodeTypes.cpp")
 
 find_package(unofficial-imgui-node-editor CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
