@@ -77,11 +77,67 @@ namespace NodeDefinitions
 		{ 147, 226, 74, 255 }
 	};
 
+	static NodeDef AdditiveBlendNode{
+		"Additive Blend",
+		"blend_add",
+		{
+			{ "Additive Pose", "add", PinType::Pose},
+			{ "Full Pose", "full", PinType::Pose},
+			{ "Value Input", "val", PinType::Float}
+		},
+		{
+			{ "Output Pose", "output", PinType::Pose}
+		},
+		{ 147, 226, 74, 255 }
+	};
+
 	static NodeDef FixedValueNode{
 		"Fixed Value",
 		"fixed_val",
 		{
 			{ "Value", "val", PinType::CustomFloat},
+		},
+		{
+			{ "Value Output", "output", PinType::Float}
+		},
+		{ 177, 3, 252, 255  }
+	};
+
+	static NodeDef VariableNode{
+		"Variable",
+		"var",
+		{
+			{ "Name", "name", PinType::CustomString},
+			{ "Default Value", "defVal", PinType::CustomFloat}
+		},
+		{
+			{ "Value Output", "output", PinType::Float}
+		},
+		{ 177, 3, 252, 255  }
+	};
+
+	static NodeDef LimitROCNode{
+		"Limit Rate-of-Change",
+		"limit_roc",
+		{
+			{ "Value Input", "input", PinType::Float},
+			{ "Rate-of-Change/s", "roc", PinType::CustomFloat}
+		},
+		{
+			{ "Value Output", "output", PinType::Float}
+		},
+		{ 177, 3, 252, 255  }
+	};
+
+	static NodeDef TransformRangeNode{
+		"Transform Range",
+		"transform_range",
+		{
+			{ "Value Input", "input", PinType::Float},
+			{ "Old Min", "oldMin", PinType::CustomFloat},
+			{ "Old Max", "oldMax", PinType::CustomFloat},
+			{ "New Min", "newMin", PinType::CustomFloat},
+			{ "New Max", "newMax", PinType::CustomFloat}
 		},
 		{
 			{ "Value Output", "output", PinType::Float}
