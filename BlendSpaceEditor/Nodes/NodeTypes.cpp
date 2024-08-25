@@ -72,11 +72,16 @@ bool Node::FromJson(nlohmann::json& obj, size_t& maxId)
 	}
 
 	if (!targetDef) {
-		return false;
+		throw std::exception{ "Node has unknown type." };
 	}
 
 	size_t targetId = obj["id"];
 	maxId = std::max(targetId, maxId);
+
+	if (maxId > INT32_MAX) {
+		throw std::exception{ "[N] Node ID exceeds maximum value." };
+	}
+
 	targetDef->CopyToNode([targetId]() -> int {
 		return targetId;
 	}, *this);
@@ -109,4 +114,6 @@ bool Node::FromJson(nlohmann::json& obj, size_t& maxId)
 			}
 		}
 	}
+
+	return true;
 }

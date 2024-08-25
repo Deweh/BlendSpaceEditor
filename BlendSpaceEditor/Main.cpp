@@ -39,7 +39,9 @@ namespace Main
         auto time = std::chrono::system_clock::to_time_t(now);
 
         std::ostringstream oss;
-        oss << std::put_time(std::localtime(&time), "%I:%M:%S %p");
+        tm curLocalTime;
+        localtime_s(&curLocalTime, &time);
+        oss << std::put_time(& curLocalTime, "%I:%M:%S %p");
         return oss.str();
     }
 
@@ -70,7 +72,7 @@ namespace Main
     {
         std::ifstream inFile{ filePath };
         if (!inFile.is_open() || !inFile.good()) {
-            MessageBoxA(g_MainHWND, "Failed to load file.", "Error", 0);
+            MessageBoxA(g_MainHWND, "Failed to open file.", "Error", 0);
             return;
         }
 
@@ -79,63 +81,84 @@ namespace Main
             obj = nlohmann::json::parse(inFile);
         }
         catch (const std::exception& ex) {
-            MessageBoxA(g_MainHWND, ex.what(), "Error", 0);
+            MessageBoxA(g_MainHWND, std::format("Failed to parse blend graph file. Error: {}", ex.what()).c_str(), "Error", 0);
             return;
         }
 
         g_mainEditor->m_Nodes.clear();
         g_mainEditor->m_Links.clear();
 
+        bool successful = true;
         ed::SetCurrentEditor(g_mainEditor->m_Editor);
-        auto& nodes = obj["nodes"];
-        size_t lastId = 0;
-        for (auto& n : nodes) {
-            if (!n.is_object())
-                continue;
+        try {
+            auto& nodes = obj["nodes"];
+            size_t lastId = 0;
+            for (auto& n : nodes) {
+                if (!n.is_object())
+                    continue;
 
-            auto& curNode = g_mainEditor->m_Nodes.emplace_back();
-            curNode.FromJson(n, lastId);
-        }
-
-        for (auto& n : g_mainEditor->m_Nodes) {
-            for (auto& i : n.inputs) {
-                i.id = ++lastId;
+                auto& curNode = g_mainEditor->m_Nodes.emplace_back();
+                if (!curNode.FromJson(n, lastId)) {
+                    throw std::exception{ "Failed to parse node. " };
+                }
             }
-            for (auto& o : n.outputs) {
-                o.id = ++lastId;
+
+            for (auto& n : g_mainEditor->m_Nodes) {
+                for (auto& i : n.inputs) {
+                    i.id = ++lastId;
+                }
+                for (auto& o : n.outputs) {
+                    o.id = ++lastId;
+                }
             }
-        }
 
-        g_mainEditor->m_LastId = lastId;
+            if (lastId > INT32_MAX) {
+                throw std::exception{ "[P] Node ID exceeds maximum value." };
+            }
 
-        for (auto& n : g_mainEditor->m_Nodes) {
-            for (auto& i : n.inputs) {
-                if (i.type < PinType::CustomStart)
-                {
-                    auto& connected = std::get<NodeInputConnection>(i.connected);
-                    auto targetNode = g_mainEditor->FindNode(connected.nodeId);
-                    if (!targetNode)
-                        continue;
+            g_mainEditor->m_LastId = lastId;
 
-                    for (auto& o : targetNode->outputs) {
-                        if (o.def->typeName == connected.typeName) {
-                            connected.id = o.id;
-                            auto& outConnect = std::get<NodeOutputConnection>(o.connected);
-                            outConnect.ids.push_back(i.id);
-                            g_mainEditor->m_Links.emplace_back(g_mainEditor->GetNextId(), o.id, i.id);
-                            g_mainEditor->m_Links.back().color = g_mainEditor->GetIconColor(i.type);
-                            break;
+            for (auto& n : g_mainEditor->m_Nodes) {
+                for (auto& i : n.inputs) {
+                    if (i.type < PinType::CustomStart)
+                    {
+                        auto& connected = std::get<NodeInputConnection>(i.connected);
+                        auto targetNode = g_mainEditor->FindNode(connected.nodeId);
+                        if (!targetNode)
+                            continue;
+
+                        for (auto& o : targetNode->outputs) {
+                            if (o.def->typeName == connected.typeName) {
+                                connected.id = o.id;
+                                auto& outConnect = std::get<NodeOutputConnection>(o.connected);
+                                outConnect.ids.push_back(i.id);
+                                g_mainEditor->m_Links.emplace_back(g_mainEditor->GetNextId(), o.id, i.id);
+                                g_mainEditor->m_Links.back().color = g_mainEditor->GetIconColor(i.type);
+                                break;
+                            }
                         }
                     }
                 }
             }
         }
+        catch (const std::exception& ex) {
+            successful = false;
+            g_mainEditor->m_Nodes.clear();
+            g_mainEditor->m_Links.clear();
+            MessageBoxA(g_MainHWND, std::format("Failed to load blend graph file. Error: {}", ex.what()).c_str(), "Error", 0);
+        }
+        
         ed::SetCurrentEditor(nullptr);
 
-        g_statusText = std::format("Loaded {} at {}", filePath.generic_string(), GetCurrentClockTime());
+        if (!successful) {
+            g_mainEditor->InitNew();
+            g_curPath = L"";
+            g_statusText = "";
+        }
+        else {
+            g_statusText = std::format("Loaded {} at {}", filePath.generic_string(), GetCurrentClockTime());
+        }
     }
-
-    
 
     void OnLoad()
     {
