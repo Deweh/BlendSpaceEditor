@@ -16,6 +16,7 @@ namespace Main
     ImFont* g_mainFontMedium{ nullptr };
     std::string g_statusText{ "" };
     std::filesystem::path g_curPath{ L"" };
+    std::filesystem::path pendingOpenFile{ L"" };
 
 	void OnStart(ImGuiIO& io)
 	{
@@ -193,6 +194,12 @@ namespace Main
 		ImGui::SetNextWindowSize(io.DisplaySize);
 		ImGui::SetNextWindowPos({ .0f, .0f });
 		ImGui::Begin("Main", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_MenuBar);
+
+        if (!pendingOpenFile.empty()) {
+            g_curPath = pendingOpenFile;
+            pendingOpenFile.clear();
+            LoadData(g_curPath);
+        }
 
         if (ImGui::IsKeyDown(ImGuiKey_LeftCtrl)) {
             if (ImGui::IsKeyReleased(ImGuiKey_S, false)) {

@@ -7,6 +7,7 @@
 #define WIN32_LEAN_AND_MEAN
 #endif
 #include <windows.h>
+#include <shellapi.h>
 #include <GL/GL.h>
 #include <GL/wglext.h>
 #include <tchar.h>
@@ -29,13 +30,21 @@ void ResetDeviceWGL();
 LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 // Main code
-int main(int, char**)
+int main(int argc, char** argv)
 {
     // Create application window
     ImGui_ImplWin32_EnableDpiAwareness();
     WNDCLASSEXW wc = { sizeof(wc), CS_OWNDC, WndProc, 0L, 0L, GetModuleHandle(nullptr), nullptr, nullptr, nullptr, nullptr, L"ImGui Example", nullptr };
+    HICON icon = LoadIconA(GetModuleHandle(nullptr), "IDI_ICON1");
+    wc.hIcon = icon;
+    wc.hIconSm = icon;
     ::RegisterClassExW(&wc);
-    g_MainHWND = ::CreateWindowW(wc.lpszClassName, L"BlendSpaceEditor", WS_OVERLAPPEDWINDOW, 100, 100, 1280, 800, nullptr, nullptr, wc.hInstance, nullptr);
+    g_MainHWND = ::CreateWindowW(wc.lpszClassName, L"Blend Graph Editor", WS_OVERLAPPEDWINDOW, 100, 100, 1280, 800, nullptr, nullptr, wc.hInstance, nullptr);
+
+    if (argc > 1)
+    {
+        Main::pendingOpenFile = argv[1];
+    }
 
     // Initialize OpenGL
     if (!CreateDeviceWGL(g_MainHWND, &g_MainWindow))
@@ -169,6 +178,25 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
     switch (msg)
     {
+    case WM_CREATE:
+        {
+            DragAcceptFiles(hWnd, TRUE);
+            return 0;
+        }
+    case WM_DROPFILES:
+        {
+            HDROP hDrop = (HDROP)wParam;
+            UINT fileCount = DragQueryFile(hDrop, 0xFFFFFFFF, NULL, 0);
+
+            if (fileCount > 0) {
+                TCHAR filePath[MAX_PATH];
+                DragQueryFile(hDrop, 0, filePath, MAX_PATH);
+                Main::pendingOpenFile = filePath;
+            }
+
+            DragFinish(hDrop);
+            return 0;
+        }
     case WM_SIZE:
         if (wParam != SIZE_MINIMIZED)
         {
