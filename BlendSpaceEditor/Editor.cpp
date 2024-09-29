@@ -324,13 +324,6 @@ void Editor::OnFrame_RenderNodes(ImGuiIO& io)
                 ImGui::TextUnformatted(input.name.c_str());
             }
 
-            /*
-            if (input.type == PinType::Bool)
-            {
-                ImGui::SameLine();
-                ImGui::Button("Bool Button");
-            }
-            */
             ImGui::PopStyleVar();
             builder.EndInput();
 

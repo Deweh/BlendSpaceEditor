@@ -91,6 +91,27 @@ namespace NodeDefinitions
 		{ 147, 226, 74, 255 }
 	};
 
+	static NodeDef IKTwoBoneAdjNode{
+		"IK Two Bone Adjust",
+		"ik_2b_adj",
+		{
+			{ "Input Pose", "pose", PinType::Pose },
+			{ "Start Bone", "start_node", PinType::CustomString},
+			{ "Mid Bone", "mid_node", PinType::CustomString},
+			{ "End Bone", "end_node", PinType::CustomString},
+			{ "Mid Axis X", "mid_x", PinType::CustomFloat},
+			{ "Mid Axis Y", "mid_y", PinType::CustomFloat},
+			{ "Mid Axis Z", "mid_z", PinType::CustomFloat},
+			{ "X Offset", "x_offset", PinType::Float},
+			{ "Y Offset", "y_offset", PinType::Float },
+			{ "Z Offset", "z_offset", PinType::Float }
+		},
+		{
+			{ "Output Pose", "output", PinType::Pose }
+		},
+		{ 147, 226, 74, 255 }
+	};
+
 	static NodeDef FixedValueNode{
 		"Fixed Value",
 		"fixed_val",
