@@ -15,6 +15,7 @@ void Node::ToJson(nlohmann::json& obj)
 			curInput.push_back(connected.typeName);
 		} else {
 			switch (i.type) {
+			case PinType::CustomBool: values[i.def->typeName] = std::get<NodeBoolCustomValueConnection>(i.connected).value; break;
 			case PinType::CustomFloat: values[i.def->typeName] = std::get<NodeFloatCustomValueConnection>(i.connected).value; break;
 			case PinType::CustomInt: values[i.def->typeName] = std::get<NodeIntCustomValueConnection>(i.connected).value; break;
 			case PinType::CustomString: values[i.def->typeName] = std::get<NodeStringCustomValueConnection>(i.connected).value; break;
@@ -107,6 +108,7 @@ bool Node::FromJson(nlohmann::json& obj, size_t& maxId)
 			auto valIter = values.find(i.def->typeName);
 			if (valIter != values.end()) {
 				switch (i.type) {
+				case PinType::CustomBool: std::get<NodeBoolCustomValueConnection>(i.connected).value = *valIter; break;
 				case PinType::CustomFloat: std::get<NodeFloatCustomValueConnection>(i.connected).value = *valIter; break;
 				case PinType::CustomInt: std::get<NodeIntCustomValueConnection>(i.connected).value = *valIter; break;
 				case PinType::CustomString: std::get<NodeStringCustomValueConnection>(i.connected).value = *valIter; break;

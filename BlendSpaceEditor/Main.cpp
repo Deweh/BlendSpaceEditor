@@ -24,6 +24,7 @@ namespace Main
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;    // Enable Gamepad Controls
         io.IniFilename = NULL;
         ImGui::StyleColorsDark();
+        ImGui::GetStyle().Colors[ImGuiCol_PopupBg] = ImVec4(.0f, .0f, .0f, 0.5f);
         g_mainFont = ImGui_LoadWindowsFont("Arial", 22.0f, io);
         g_mainFontSmall = ImGui_LoadWindowsFont("Arial", 16.0f, io);
         g_mainFontMedium = ImGui_LoadWindowsFont("Arial", 18.5f, io);

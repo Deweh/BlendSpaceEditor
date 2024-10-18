@@ -13,15 +13,35 @@ namespace NodeDefinitions
 
 	NodeDef::NodeDef(const char* _name,
 		const char* _typeName,
+		NodeCategoryType _category,
 		const std::vector<PinDef>& _inputs,
-		const std::vector<PinDef>& _outputs,
-		ImColor _color) :
+		const std::vector<PinDef>& _outputs) :
 		name(_name),
 		typeName(_typeName),
+		category(_category),
 		inputs(_inputs.begin(), _inputs.end()),
-		outputs(_outputs.begin(), _outputs.end()),
-		color(_color)
+		outputs(_outputs.begin(), _outputs.end())
 	{
+		using enum NodeCategoryType;
+		switch (_category) {
+		case PoseCreators:
+		case PoseModifiers:
+			color = { 147, 226, 74, 255 };
+			break;
+		case ValueCreators:
+		case ValueModifiers:
+			color = { 177, 3, 252, 255 };
+			break;
+		case VectorCreators:
+		case VectorModifiers:
+			color = { 252, 227, 0, 255 };
+			break;
+		case Actor:
+			color = { 255, 0, 0, 255 };
+			break;
+		default:
+			color = { 255, 255, 255, 255 };
+		}
 		GetDefList().emplace_back(this);
 	}
 
@@ -52,6 +72,7 @@ namespace NodeDefinitions
 	static NodeDef FullAnimationNode{
 		"Full Animation",
 		"anim",
+		NodeCategoryType::PoseCreators,
 		{
 			{ "File", "file", PinType::CustomString},
 			{ "Sync ID", "syncId", PinType::CustomInt },
@@ -59,13 +80,36 @@ namespace NodeDefinitions
 		},
 		{
 			{ "Output Pose", "output", PinType::Pose}
+		}
+	};
+
+	static NodeDef StaticPoseNode{
+		"Static Pose",
+		"pose",
+		NodeCategoryType::PoseCreators,
+		{
+			{ "File", "file", PinType::CustomString}
 		},
-		{ 147, 226, 74, 255 }
+		{
+			{ "Output Pose", "output", PinType::Pose}
+		},
+	};
+
+	static NodeDef BasePoseNode{
+		"Base Game Pose",
+		"base_pose",
+		NodeCategoryType::PoseCreators,
+		{
+		},
+		{
+			{ "Output Pose", "output", PinType::Pose}
+		},
 	};
 
 	static NodeDef BlendSpace1DNode{
 		"Blend Space 1D",
 		"blend_1d",
+		NodeCategoryType::PoseModifiers,
 		{
 			{ "Pose 1", "1", PinType::Pose},
 			{ "Pose 2", "2", PinType::Pose},
@@ -73,13 +117,13 @@ namespace NodeDefinitions
 		},
 		{
 			{ "Output Pose", "output", PinType::Pose}
-		},
-		{ 147, 226, 74, 255 }
+		}
 	};
 
 	static NodeDef AdditiveBlendNode{
 		"Additive Blend",
 		"blend_add",
+		NodeCategoryType::PoseModifiers,
 		{
 			{ "Additive Pose", "add", PinType::Pose},
 			{ "Full Pose", "full", PinType::Pose},
@@ -88,12 +132,12 @@ namespace NodeDefinitions
 		{
 			{ "Output Pose", "output", PinType::Pose}
 		},
-		{ 147, 226, 74, 255 }
 	};
 
 	static NodeDef IKTwoBoneAdjNode{
-		"IK Two Bone Adjust",
+		"IK Two Bone",
 		"ik_2b_adj",
+		NodeCategoryType::PoseModifiers,
 		{
 			{ "Input Pose", "pose", PinType::Pose },
 			{ "Start Bone", "start_node", PinType::CustomString},
@@ -102,73 +146,80 @@ namespace NodeDefinitions
 			{ "Mid Axis X", "mid_x", PinType::CustomFloat},
 			{ "Mid Axis Y", "mid_y", PinType::CustomFloat},
 			{ "Mid Axis Z", "mid_z", PinType::CustomFloat},
-			{ "X Offset", "x_offset", PinType::Float},
-			{ "Y Offset", "y_offset", PinType::Float },
-			{ "Z Offset", "z_offset", PinType::Float }
+			{ "IK Target", "target", PinType::Vector}
 		},
 		{
 			{ "Output Pose", "output", PinType::Pose }
+		}
+	};
+
+	static NodeDef IKOneBoneNode{
+		"IK One Bone",
+		"ik_1b",
+		NodeCategoryType::PoseModifiers,
+		{
+			{ "Input Pose", "pose", PinType::Pose },
+			{ "Bone Name", "bone", PinType::CustomString},
+			{ "Up Axis X", "up_x", PinType::CustomFloat},
+			{ "Up Axis Y", "up_y", PinType::CustomFloat},
+			{ "Up Axis Z", "up_z", PinType::CustomFloat},
+			{ "Forward Axis X", "forward_x", PinType::CustomFloat},
+			{ "Forward Axis Y", "forward_y", PinType::CustomFloat},
+			{ "Forward Axis Z", "forward_z", PinType::CustomFloat},
+			{ "IK Target", "target", PinType::Vector},
+			{ "Bone End Offset", "offset", PinType::Vector}
 		},
-		{ 147, 226, 74, 255 }
+		{
+			{ "Output Pose", "output", PinType::Pose }
+		}
+	};
+
+	static NodeDef SpringBoneNode{
+		"Spring Bone",
+		"spring_bone",
+		NodeCategoryType::PoseModifiers,
+		{
+			{ "Input Pose", "pose", PinType::Pose },
+			{ "Bone Name", "bone", PinType::CustomString},
+			{ "Stiffness", "stiffness", PinType::Float},
+			{ "Damping", "damping", PinType::Float},
+			{ "Mass", "mass", PinType::Float},
+			{ "Gravity", "gravity", PinType::Vector},
+		},
+		{
+			{ "Output Pose", "output", PinType::Pose }
+		}
 	};
 
 	static NodeDef FixedValueNode{
 		"Fixed Value",
 		"fixed_val",
+		NodeCategoryType::ValueCreators,
 		{
 			{ "Value", "val", PinType::CustomFloat},
 		},
 		{
 			{ "Value Output", "output", PinType::Float}
-		},
-		{ 177, 3, 252, 255  }
+		}
 	};
 
 	static NodeDef VariableNode{
 		"Variable",
 		"var",
+		NodeCategoryType::ValueCreators,
 		{
 			{ "Name", "name", PinType::CustomString},
 			{ "Default Value", "defVal", PinType::CustomFloat}
 		},
 		{
 			{ "Value Output", "output", PinType::Float}
-		},
-		{ 177, 3, 252, 255  }
-	};
-
-	static NodeDef LimitROCNode{
-		"Limit Rate-of-Change",
-		"limit_roc",
-		{
-			{ "Value Input", "input", PinType::Float},
-			{ "Rate-of-Change/s", "roc", PinType::CustomFloat}
-		},
-		{
-			{ "Value Output", "output", PinType::Float}
-		},
-		{ 177, 3, 252, 255  }
-	};
-
-	static NodeDef TransformRangeNode{
-		"Transform Range",
-		"transform_range",
-		{
-			{ "Value Input", "input", PinType::Float},
-			{ "Old Min", "oldMin", PinType::CustomFloat},
-			{ "Old Max", "oldMax", PinType::CustomFloat},
-			{ "New Min", "newMin", PinType::CustomFloat},
-			{ "New Max", "newMax", PinType::CustomFloat}
-		},
-		{
-			{ "Value Output", "output", PinType::Float}
-		},
-		{ 177, 3, 252, 255  }
+		}
 	};
 
 	static NodeDef SmoothedRandomValueNode{
 		"Smoothed Random Value",
 		"smooth_rand",
+		NodeCategoryType::ValueCreators,
 		{
 			{ "Smooth Duration Min", "dur_min", PinType::CustomFloat},
 			{ "Smooth Duration Max", "dur_max", PinType::CustomFloat },
@@ -181,19 +232,196 @@ namespace NodeDefinitions
 		},
 		{
 			{ "Value Output", "output", PinType::Float}
+		}
+	};
+
+	static NodeDef LimitROCNode{
+		"Limit Rate-of-Change",
+		"limit_roc",
+		NodeCategoryType::ValueModifiers,
+		{
+			{ "Value Input", "input", PinType::Float},
+			{ "Rate-of-Change/s", "roc", PinType::CustomFloat}
 		},
-		{ 177, 3, 252, 255  }
+		{
+			{ "Value Output", "output", PinType::Float}
+		}
+	};
+
+	static NodeDef SmoothValNode{
+		"Smooth Value",
+		"smooth_val",
+		NodeCategoryType::ValueModifiers,
+		{
+			{ "Value Input", "input", PinType::Float},
+			{ "Percent/s", "percent", PinType::CustomFloat}
+		},
+		{
+			{ "Value Output", "output", PinType::Float}
+		}
+	};
+
+	static NodeDef TransformRangeNode{
+		"Transform Range",
+		"transform_range",
+		NodeCategoryType::ValueModifiers,
+		{
+			{ "Value Input", "input", PinType::Float},
+			{ "Old Min", "oldMin", PinType::CustomFloat},
+			{ "Old Max", "oldMax", PinType::CustomFloat},
+			{ "New Min", "newMin", PinType::CustomFloat},
+			{ "New Max", "newMax", PinType::CustomFloat}
+		},
+		{
+			{ "Value Output", "output", PinType::Float}
+		}
+	};
+
+	static NodeDef GetBoneRotationNode{
+		"Get Bone Rotation",
+		"get_bone_rot",
+		NodeCategoryType::VectorCreators,
+		{
+			{ "Input Pose", "input", PinType::Pose},
+			{ "Bone Name", "bone", PinType::CustomString},
+			{ "Model Space", "ms", PinType::CustomBool}
+		},
+		{
+			{ "Vector Output", "output", PinType::Vector}
+		}
+	};
+
+	static NodeDef GetBonePositionNode{
+		"Get Bone Position",
+		"get_bone_pos",
+		NodeCategoryType::VectorCreators,
+		{
+			{ "Input Pose", "input", PinType::Pose},
+			{ "Bone Name", "bone", PinType::CustomString},
+			{ "Model Space", "ms", PinType::CustomBool}
+		},
+		{
+			{ "Vector Output", "output", PinType::Vector}
+		}
+	};
+
+	static NodeDef FixedVectorNode{
+		"Fixed Vector",
+		"fixed_vec",
+		NodeCategoryType::VectorCreators,
+		{
+			{ "X", "x", PinType::CustomFloat},
+			{ "Y", "y", PinType::CustomFloat},
+			{ "Z", "z", PinType::CustomFloat},
+			{ "W", "w", PinType::CustomFloat},
+		},
+		{
+			{ "Vector Output", "output", PinType::Vector}
+		}
+	};
+
+	static NodeDef MakeVectorNode{
+		"Make Vector",
+		"make_vec",
+		NodeCategoryType::VectorCreators,
+		{
+			{ "X", "x", PinType::Float},
+			{ "Y", "y", PinType::Float},
+			{ "Z", "z", PinType::Float},
+			{ "W", "w", PinType::Float},
+		},
+		{
+			{ "Vector Output", "output", PinType::Vector}
+		}
+	};
+
+	static NodeDef AddVectorsNode{
+		"Add Vectors",
+		"add_vecs",
+		NodeCategoryType::VectorModifiers,
+		{
+			{ "Vector 1", "1", PinType::Vector},
+			{ "Vector 2", "2", PinType::Vector}
+		},
+		{
+			{ "Vector Output", "output", PinType::Vector}
+		}
+	};
+
+	static NodeDef SubtractVectorsNode{
+		"Subtract Vectors",
+		"sub_vecs",
+		NodeCategoryType::VectorModifiers,
+		{
+			{ "Vector 1", "1", PinType::Vector},
+			{ "Vector 2", "2", PinType::Vector}
+		},
+		{
+			{ "Vector Output", "output", PinType::Vector}
+		}
+	};
+
+	static NodeDef DivideVectorsNode{
+		"Divide Vectors",
+		"div_vecs",
+		NodeCategoryType::VectorModifiers,
+		{
+			{ "Dividend Vector", "1", PinType::Vector},
+			{ "Divisor Vector", "2", PinType::Vector}
+		},
+		{
+			{ "Vector Output", "output", PinType::Vector}
+		}
+	};
+
+	static NodeDef MultiplyVectorsNode{
+		"Multiply Vectors",
+		"mult_vecs",
+		NodeCategoryType::VectorModifiers,
+		{
+			{ "Vector 1", "1", PinType::Vector},
+			{ "Vector 2", "2", PinType::Vector}
+		},
+		{
+			{ "Vector Output", "output", PinType::Vector}
+		}
+	};
+
+	static NodeDef AddRotationVectorsNode{
+		"Add Rotation Vectors",
+		"add_rot_vecs",
+		NodeCategoryType::VectorModifiers,
+		{
+			{ "Vector 1", "1", PinType::Vector},
+			{ "Vector 2", "2", PinType::Vector}
+		},
+		{
+			{ "Vector Output", "output", PinType::Vector}
+		}
+	};
+
+	static NodeDef SubtractRotationVectorsNode{
+		"Subtract Rotation Vectors",
+		"sub_rot_vecs",
+		NodeCategoryType::VectorModifiers,
+		{
+			{ "Vector 1", "1", PinType::Vector},
+			{ "Vector 2", "2", PinType::Vector}
+		},
+		{
+			{ "Vector Output", "output", PinType::Vector}
+		}
 	};
 
 	static NodeDef ActorNode{
 		"Actor",
 		"actor",
+		NodeCategoryType::Actor,
 		{
 			{ "Input Pose", "input", PinType::Pose}
 		},
 		{
-		},
-		{ 255, 0, 0, 255 }
+		}
 	};
 
 }

@@ -14,6 +14,28 @@ namespace NodeDefinitions
 
 namespace ed = ax::NodeEditor;
 
+enum class NodeCategoryType : uint16_t
+{
+    PoseCreators,
+    PoseModifiers,
+    ValueCreators,
+    ValueModifiers,
+    VectorCreators,
+    VectorModifiers,
+    Actor
+};
+
+static std::vector<std::pair<std::string, NodeCategoryType>> NodeCategoryNames =
+{
+    { "Pose Creators" , NodeCategoryType::PoseCreators },
+    { "Pose Modifiers" , NodeCategoryType::PoseModifiers },
+    { "Value Creators" , NodeCategoryType::ValueCreators },
+    { "Value Modifiers" , NodeCategoryType::ValueModifiers },
+    { "Vector Creators" , NodeCategoryType::VectorCreators },
+    { "Vector Modifiers" , NodeCategoryType::VectorModifiers },
+    { "Actor" , NodeCategoryType::Actor }
+};
+
 enum class PinType : uint16_t
 {
     Flow = 0,
@@ -21,13 +43,14 @@ enum class PinType : uint16_t
     Int = 2,
     Pose = 3,
     String = 4,
-    Object = 5,
+    Vector = 5,
     Float = 6,
     Delegate = 7,
     CustomStart = 8,
     CustomInt = 9,
     CustomString = 10,
-    CustomFloat = 11
+    CustomFloat = 11,
+    CustomBool = 12
 };
 
 enum class PinKind
@@ -66,6 +89,11 @@ struct NodeFloatCustomValueConnection
     float value{ .0f };
 };
 
+struct NodeBoolCustomValueConnection
+{
+    bool value{ false };
+};
+
 struct Pin
 {
     using ConnectionVariant = std::variant<
@@ -73,7 +101,8 @@ struct Pin
         NodeOutputConnection,
         NodeStringCustomValueConnection,
         NodeIntCustomValueConnection,
-        NodeFloatCustomValueConnection>;
+        NodeFloatCustomValueConnection,
+        NodeBoolCustomValueConnection>;
 
     ed::PinId id;
     ed::NodeId node;
@@ -106,6 +135,7 @@ struct Node
             input.kind = PinKind::Input;
             if (input.type > PinType::CustomStart) {
                 switch (input.type) {
+                case PinType::CustomBool: input.connected.emplace<NodeBoolCustomValueConnection>(); break;
                 case PinType::CustomInt: input.connected.emplace<NodeIntCustomValueConnection>(); break;
                 case PinType::CustomFloat: input.connected.emplace<NodeFloatCustomValueConnection>(); break;
                 case PinType::CustomString: input.connected.emplace<NodeStringCustomValueConnection>(); break;

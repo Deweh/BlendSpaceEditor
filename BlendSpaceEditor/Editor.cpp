@@ -196,7 +196,7 @@ ImColor Editor::GetIconColor(PinType type)
     case PinType::Int:      return ImColor(68, 201, 156);
     case PinType::Pose:    return ImColor(147, 226, 74);
     case PinType::String:   return ImColor(124, 21, 153);
-    case PinType::Object:   return ImColor(51, 150, 215);
+    case PinType::Vector:   return ImColor(252, 181, 0);
     case PinType::Float: return ImColor(218, 0, 183);
     case PinType::Delegate: return ImColor(255, 48, 48);
     }
@@ -214,7 +214,7 @@ void Editor::DrawPinIcon(const Pin& pin, bool connected, int alpha)
     case PinType::Int:      iconType = IconType::Circle; break;
     case PinType::Pose:    iconType = IconType::Circle; break;
     case PinType::String:   iconType = IconType::Circle; break;
-    case PinType::Object:   iconType = IconType::Circle; break;
+    case PinType::Vector:   iconType = IconType::Circle; break;
     case PinType::Float: iconType = IconType::Circle; break;
     case PinType::Delegate: iconType = IconType::Square; break;
     default:
@@ -343,6 +343,10 @@ void Editor::OnFrame_RenderNodes(ImGuiIO& io)
                 ImGui::InputFloat("", &std::get<NodeFloatCustomValueConnection>(input.connected).value, 0.1f, 0.5f);
                 EndCustomValue();
                 break;
+            case PinType::CustomBool:
+                BeginCustomValue(35.0f, input.id.Get());
+                ImGui::Checkbox("", &std::get<NodeBoolCustomValueConnection>(input.connected).value);
+                EndCustomValue();
             default:
                 break;
             }
@@ -526,17 +530,31 @@ void Editor::OnFrame_RenderNewNodeMenu(ImGuiIO& io)
 {
     if (ImGui::BeginPopup("Create New Node"))
     {
-        ImGui::Dummy(ImVec2(0, 8));
+        ImGui::Dummy(ImVec2(0, 4));
 
         Node* node = nullptr;
-        auto& defs = NodeDefinitions::GetDefList();
 
+        for (auto& c : NodeCategoryNames) {
+            if (ImGui::BeginMenu(c.first.c_str())) {
+                auto& defs = NodeDefinitions::GetDefList();
+                for (auto& d : defs) {
+                    if (d->category != c.second)
+                        continue;
+
+                    if (ImGui::MenuItem(d->name.data()))
+                        node = SpawnNode(d);
+                }
+                ImGui::EndMenu();
+            }
+        }
+        /*
         for (auto& d : defs) {
             if (ImGui::MenuItem(d->name.data()))
                 node = SpawnNode(d);
         }
+        */
 
-        ImGui::Dummy(ImVec2(0, 8));
+        ImGui::Dummy(ImVec2(0, 4));
 
         if (node)
         {
