@@ -181,6 +181,11 @@ namespace NodeDefinitions
 		{
 			{ "Input Pose", "pose", PinType::Pose },
 			{ "Bone Name", "bone", PinType::CustomString},
+			{ "Up Axis X", "up_x", PinType::CustomFloat},
+			{ "Up Axis Y", "up_y", PinType::CustomFloat},
+			{ "Up Axis Z", "up_z", PinType::CustomFloat},
+			{ "Linear", "linear", PinType::CustomBool},
+			{ "Angular", "angular", PinType::CustomBool},
 			{ "Stiffness", "stiffness", PinType::Float},
 			{ "Damping", "damping", PinType::Float},
 			{ "Mass", "mass", PinType::Float},
@@ -329,6 +334,20 @@ namespace NodeDefinitions
 			{ "Y", "y", PinType::Float},
 			{ "Z", "z", PinType::Float},
 			{ "W", "w", PinType::Float},
+		},
+		{
+			{ "Vector Output", "output", PinType::Vector}
+		}
+	};
+
+	static NodeDef LocalToModelNode{
+		"Local to Model Space",
+		"local_to_model",
+		NodeCategoryType::VectorModifiers,
+		{
+			{ "Input Pose", "pose", PinType::Pose},
+			{ "Parent Bone Name", "parentBone", PinType::CustomString},
+			{ "Local Position", "vec", PinType::Vector}
 		},
 		{
 			{ "Vector Output", "output", PinType::Vector}
