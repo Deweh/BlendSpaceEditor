@@ -36,6 +36,9 @@ namespace NodeDefinitions
 		case VectorModifiers:
 			color = { 252, 227, 0, 255 };
 			break;
+		case DataCreators:
+			color = { 0, 227, 252, 255 };
+			break;
 		case Actor:
 			color = { 255, 0, 0, 255 };
 			break;
@@ -181,18 +184,43 @@ namespace NodeDefinitions
 		{
 			{ "Input Pose", "pose", PinType::Pose },
 			{ "Bone Name", "bone", PinType::CustomString},
-			{ "Up Axis X", "up_x", PinType::CustomFloat},
-			{ "Up Axis Y", "up_y", PinType::CustomFloat},
-			{ "Up Axis Z", "up_z", PinType::CustomFloat},
-			{ "Linear", "linear", PinType::CustomBool},
-			{ "Angular", "angular", PinType::CustomBool},
-			{ "Stiffness", "stiffness", PinType::Float},
-			{ "Damping", "damping", PinType::Float},
-			{ "Mass", "mass", PinType::Float},
-			{ "Gravity", "gravity", PinType::Vector},
+			{ "Linear Spring Properties (Optional)", "linearProps", PinType::Data},
+			{ "Angular Spring Properties (Optional)", "angularProps", PinType::Data},
+			{ "Linear Constraint (Optional)", "linearConstr", PinType::Data},
+			{ "Angular Constraint (Optional)", "angularConstr", PinType::Data},
 		},
 		{
 			{ "Output Pose", "output", PinType::Pose }
+		}
+	};
+
+	static NodeDef SetBoneRotationNode{
+		"Set Bone Rotation",
+		"set_bone_rot",
+		NodeCategoryType::PoseModifiers,
+		{
+			{ "Input Pose", "pose", PinType::Pose},
+			{ "Bone Name", "bone", PinType::CustomString},
+			{ "Model Space", "is_ms", PinType::CustomBool},
+			{ "Input Rotation", "rot", PinType::Vector}
+		},
+		{
+			{ "Output Pose", "output", PinType::Pose}
+		}
+	};
+
+	static NodeDef SetBonePositionNode{
+		"Set Bone Position",
+		"set_bone_pos",
+		NodeCategoryType::PoseModifiers,
+		{
+			{ "Input Pose", "pose", PinType::Pose},
+			{ "Bone Name", "bone", PinType::CustomString},
+			{ "Model Space", "is_ms", PinType::CustomBool},
+			{ "Input Position", "position", PinType::Vector}
+		},
+		{
+			{ "Output Pose", "output", PinType::Pose}
 		}
 	};
 
@@ -287,9 +315,9 @@ namespace NodeDefinitions
 		"get_bone_rot",
 		NodeCategoryType::VectorCreators,
 		{
-			{ "Input Pose", "input", PinType::Pose},
+			{ "Input Pose", "pose", PinType::Pose},
 			{ "Bone Name", "bone", PinType::CustomString},
-			{ "Model Space", "ms", PinType::CustomBool}
+			{ "Model Space", "is_ms", PinType::CustomBool}
 		},
 		{
 			{ "Vector Output", "output", PinType::Vector}
@@ -429,6 +457,68 @@ namespace NodeDefinitions
 		},
 		{
 			{ "Vector Output", "output", PinType::Vector}
+		}
+	};
+
+	static NodeDef SpringPropsNode{
+		"Spring Properties",
+		"spring_props",
+		NodeCategoryType::DataCreators,
+		{
+			{ "Up Axis X", "up_x", PinType::CustomFloat},
+			{ "Up Axis Y", "up_y", PinType::CustomFloat},
+			{ "Up Axis Z", "up_z", PinType::CustomFloat},
+			{ "Stiffness", "stiff", PinType::Float},
+			{ "Damping", "damp", PinType::Float},
+			{ "Mass", "mass", PinType::Float},
+			{ "Stretch Resistance (Optional)", "resist", PinType::Float},
+			{ "Gravity (Optional)", "gravity", PinType::Vector},
+		},
+		{
+			{ "Data Out", "output", PinType::Data}
+		}
+	};
+
+	static NodeDef LinearBoxConstrNode{
+		"Linear Box Constraint",
+		"linear_box_constr",
+		NodeCategoryType::DataCreators,
+		{
+			{ "Box Minimum", "min", PinType::Vector},
+			{ "Box Maximum", "max", PinType::Vector},
+			{ "Bounce (Optional)", "bounce", PinType::Float},
+			{ "Spring (Optional)", "spring", PinType::Data},
+		},
+		{
+			{ "Data Out", "output", PinType::Data}
+		}
+	};
+
+	static NodeDef LinearSphereConstrNode{
+		"Linear Sphere Constraint",
+		"linear_sphere_constr",
+		NodeCategoryType::DataCreators,
+		{
+			{ "Radius", "radius", PinType::Float},
+			{ "Bounce (Optional)", "bounce", PinType::Float},
+			{ "Spring (Optional)", "spring", PinType::Data},
+		},
+		{
+			{ "Data Out", "output", PinType::Data}
+		}
+	};
+
+	static NodeDef AngularConeConstrNode{
+		"Angular Cone Constraint",
+		"angle_cone_constr",
+		NodeCategoryType::DataCreators,
+		{
+			{ "Half Angle", "halfAngle", PinType::Float},
+			{ "Bounce (Optional)", "bounce", PinType::Float},
+			{ "Spring (Optional)", "spring", PinType::Data},
+		},
+		{
+			{ "Data Out", "output", PinType::Data}
 		}
 	};
 

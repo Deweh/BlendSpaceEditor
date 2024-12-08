@@ -191,7 +191,7 @@ ImColor Editor::GetIconColor(PinType type)
     switch (type)
     {
     default:
-    case PinType::Flow:     return ImColor(255, 255, 255);
+    case PinType::Data:     return ImColor(0, 227, 252);
     case PinType::Bool:     return ImColor(220, 48, 48);
     case PinType::Int:      return ImColor(68, 201, 156);
     case PinType::Pose:    return ImColor(147, 226, 74);
@@ -209,7 +209,7 @@ void Editor::DrawPinIcon(const Pin& pin, bool connected, int alpha)
     color.Value.w = alpha / 255.0f;
     switch (pin.type)
     {
-    case PinType::Flow:     iconType = IconType::Flow;   break;
+    case PinType::Data:     iconType = IconType::Flow;   break;
     case PinType::Bool:     iconType = IconType::Circle; break;
     case PinType::Int:      iconType = IconType::Circle; break;
     case PinType::Pose:    iconType = IconType::Circle; break;

@@ -22,6 +22,7 @@ enum class NodeCategoryType : uint16_t
     ValueModifiers,
     VectorCreators,
     VectorModifiers,
+    DataCreators,
     Actor
 };
 
@@ -33,12 +34,13 @@ static std::vector<std::pair<std::string, NodeCategoryType>> NodeCategoryNames =
     { "Value Modifiers" , NodeCategoryType::ValueModifiers },
     { "Vector Creators" , NodeCategoryType::VectorCreators },
     { "Vector Modifiers" , NodeCategoryType::VectorModifiers },
+    { "Data Creators", NodeCategoryType::DataCreators },
     { "Actor" , NodeCategoryType::Actor }
 };
 
 enum class PinType : uint16_t
 {
-    Flow = 0,
+    Data = 0,
     Bool = 1,
     Int = 2,
     Pose = 3,
