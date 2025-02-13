@@ -3,10 +3,9 @@
 #include <memory>
 #include "Win32Util.h"
 #include <fstream>
+#include "Renderer.h"
 
 namespace ed = ax::NodeEditor;
-
-extern HWND g_MainHWND;
 
 namespace Main
 {
@@ -33,7 +32,7 @@ namespace Main
 
 	void OnStop(ImGuiIO& io)
 	{
-        g_mainEditor.reset();
+		g_mainEditor.reset();
 	}
 
     std::string GetCurrentClockTime() {
@@ -61,7 +60,7 @@ namespace Main
 
         std::ofstream outFile{ filePath };
         if (!outFile.is_open() || !outFile.good()) {
-            MessageBoxA(g_MainHWND, "Failed to save file.", "Error", 0);
+            MessageBoxA(Renderer::GetSingleton().mainHWND, "Failed to save file.", "Error", 0);
             return;
         }
         outFile << obj.dump();
@@ -74,7 +73,7 @@ namespace Main
     {
         std::ifstream inFile{ filePath };
         if (!inFile.is_open() || !inFile.good()) {
-            MessageBoxA(g_MainHWND, "Failed to open file.", "Error", 0);
+            MessageBoxA(Renderer::GetSingleton().mainHWND, "Failed to open file.", "Error", 0);
             return;
         }
 
@@ -83,7 +82,7 @@ namespace Main
             obj = nlohmann::json::parse(inFile);
         }
         catch (const std::exception& ex) {
-            MessageBoxA(g_MainHWND, std::format("Failed to parse blend graph file. Error: {}", ex.what()).c_str(), "Error", 0);
+            MessageBoxA(Renderer::GetSingleton().mainHWND, std::format("Failed to parse blend graph file. Error: {}", ex.what()).c_str(), "Error", 0);
             return;
         }
 
@@ -147,7 +146,7 @@ namespace Main
             successful = false;
             g_mainEditor->m_Nodes.clear();
             g_mainEditor->m_Links.clear();
-            MessageBoxA(g_MainHWND, std::format("Failed to load blend graph file. Error: {}", ex.what()).c_str(), "Error", 0);
+            MessageBoxA(Renderer::GetSingleton().mainHWND, std::format("Failed to load blend graph file. Error: {}", ex.what()).c_str(), "Error", 0);
         }
         
         ed::SetCurrentEditor(nullptr);
@@ -164,7 +163,7 @@ namespace Main
 
     void OnLoad()
     {
-        auto result = Win32Util_OpenFileDialog(false, g_MainHWND, L"Blend Tree Files (*.bt)\0*.bt\0");
+        auto result = Win32Util_OpenFileDialog(false, Renderer::GetSingleton().mainHWND, L"Blend Tree Files (*.bt)\0*.bt\0");
         if (!result.empty()) {
             g_curPath = result;
         }
@@ -177,7 +176,7 @@ namespace Main
     void OnSave(bool forceChoosePath)
     {
         if (g_curPath.empty() || forceChoosePath) {
-            auto result = Win32Util_OpenFileDialog(true, g_MainHWND, L"Blend Tree Files (*.bt)\0*.bt\0");
+            auto result = Win32Util_OpenFileDialog(true, Renderer::GetSingleton().mainHWND, L"Blend Tree Files (*.bt)\0*.bt\0");
             if (!result.empty()) {
                 g_curPath = result;
                 g_curPath = g_curPath.replace_extension(".bt");

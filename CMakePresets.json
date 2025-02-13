@@ -1,62 +1,184 @@
-﻿{
-    "version": 3,
-    "configurePresets": [
-        {
-            "name": "windows-base",
-            "hidden": true,
-            "generator": "Ninja",
-            "binaryDir": "${sourceDir}/out/build/${presetName}",
-            "installDir": "${sourceDir}/out/install/${presetName}",
-            "cacheVariables": {
-              "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
-              "VCPKG_HOST_TRIPLET": "x64-windows-static-md",
-              "VCPKG_TARGET_TRIPLET": "x64-windows-static-md"
-            },
-            "condition": {
-                "type": "equals",
-                "lhs": "${hostSystemName}",
-                "rhs": "Windows"
-            }
-        },
-        {
-            "name": "x64-debug",
-            "displayName": "x64 Debug",
-            "inherits": "windows-base",
-            "architecture": {
-                "value": "x64",
-                "strategy": "external"
-            },
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug"
-            }
-        },
-        {
-            "name": "x64-release",
-            "displayName": "x64 Release",
-            "inherits": "x64-debug",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release"
-            }
-        },
-        {
-            "name": "x86-debug",
-            "displayName": "x86 Debug",
-            "inherits": "windows-base",
-            "architecture": {
-                "value": "x86",
-                "strategy": "external"
-            },
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug"
-            }
-        },
-        {
-            "name": "x86-release",
-            "displayName": "x86 Release",
-            "inherits": "x86-debug",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release"
-            }
-        }
-    ]
+{
+	"version": 6,
+	"cmakeMinimumRequired": {
+		"major": 3,
+		"minor": 26,
+		"patch": 0
+	},
+	"configurePresets": [
+		{
+			"name": "common",
+			"hidden": true,
+			"cacheVariables": {
+				"USING_VCPKG": "ON",
+				"CMAKE_CXX_FLAGS": "$env{PROJECT_PLATFORM_FLAGS} $env{PROJECT_TEXT_FLAGS} $env{PROJECT_COMPILER_FLAGS} $penv{CXXFLAGS}"
+			},
+			"vendor": {
+				"microsoft.com/VisualStudioSettings/CMake/1.0": {
+					"intelliSenseMode": "windows-msvc-x64",
+					"enableMicrosoftCodeAnalysis": true,
+					"enableClangTidyCodeAnalysis": true
+				}
+			}
+		},
+		{
+			"name": "packaging-vcpkg",
+			"hidden": true,
+			"cacheVariables": {
+				"CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+				"VCPKG_HOST_TRIPLET": "x64-windows-static-md",
+				"VCPKG_TARGET_TRIPLET": "x64-windows-static-md"
+			}
+		},
+		{
+			"name": "buildtype-release-o2",
+			"hidden": true,
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Release",
+				"CMAKE_CONFIGURATION_TYPES": "Release",
+				"CMAKE_CXX_FLAGS_RELEASE": "/O2 /DNDEBUG /Zi -Xclang -O3"
+			}
+		},
+		{
+			"name": "buildtype-release-od",
+			"hidden": true,
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Release",
+				"CMAKE_CONFIGURATION_TYPES": "Release",
+				"CMAKE_CXX_FLAGS_RELEASE": "/Od /DNDEBUG /Zi"
+			}
+		},
+		{
+			"name": "x64",
+			"hidden": true,
+			"architecture": "x64",
+			"cacheVariables": {
+				"CMAKE_MSVC_RUNTIME_LIBRARY": "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL"
+			}
+		},
+		{
+			"name": "generator-msvc",
+			"hidden": true,
+			"inherits": "x64",
+			"generator": "Visual Studio 17 2022"
+		},
+		{
+			"name": "generator-ninja",
+			"hidden": true,
+			"generator": "Ninja",
+			"cacheVariables": {
+				"CMAKE_MAKE_PROGRAM": "ninja.exe",
+				"CMAKE_MSVC_RUNTIME_LIBRARY": "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL"
+			}
+		},
+		{
+			"name": "compiler-msvc",
+			"hidden": true,
+			"cacheVariables": {
+				"CMAKE_SHARED_LINKER_FLAGS_RELEASE": "/DEBUG /OPT:REF /OPT:ICF"
+			},
+			"environment": {
+				"PROJECT_COMPILER_FLAGS": "/cgthreads8 /diagnostics:caret /fp:contract /fp:except- /EHsc /MP /W4 /external:anglebrackets /external:W0",
+				"PROJECT_COMPILER": "msvc"
+			}
+		},
+		{
+			"name": "compiler-clang",
+			"hidden": true,
+			"cacheVariables": {
+				"CMAKE_C_COMPILER": "clang",
+				"CMAKE_CXX_COMPILER": "clang++"
+			},
+			"environment": {
+				"PROJECT_COMPILER": "clang",
+				"PROJECT_COMPILER_FLAGS": "-Wno-overloaded-virtual -Wno-delete-non-abstract-non-virtual-dtor -Wno-inconsistent-missing-override -Wno-reinterpret-base-class"
+			},
+			"vendor": {
+				"microsoft.com/VisualStudioSettings/CMake/1.0": {
+					"intelliSenseMode": "windows-clang-x64"
+				}
+			}
+		},
+		{
+			"name": "compiler-clang-cl",
+			"hidden": true,
+			"inherits": "compiler-clang",
+			"cacheVariables": {
+				"CMAKE_C_COMPILER": "clang-cl",
+				"CMAKE_CXX_COMPILER": "clang-cl",
+				"CMAKE_EXE_LINKER_FLAGS_RELEASE": "/DEBUG /OPT:REF /OPT:ICF"
+			},
+			"environment": {
+				"CC": "clang-cl",
+				"CXX": "clang-cl",
+				"PROJECT_COMPILER_FLAGS": "/Zi /permissive- /EHsc /W4 -Wno-overloaded-virtual -Wno-delete-non-abstract-non-virtual-dtor -Wno-inconsistent-missing-override -Wno-reinterpret-base-class -D__cpp_consteval"
+			}
+		},
+		{
+			"name": "build-release-msvc-o2",
+			"inherits": [
+				"common",
+				"packaging-vcpkg",
+				"buildtype-release-o2",
+				"generator-msvc",
+				"compiler-msvc"
+			]
+		},
+		{
+			"name": "build-release-msvc-od",
+			"inherits": [
+				"common",
+				"packaging-vcpkg",
+				"buildtype-release-od",
+				"generator-msvc",
+				"compiler-msvc"
+			]
+		},
+		{
+			"name": "build-release-clang-o2",
+			"inherits": [
+				"common",
+				"packaging-vcpkg",
+				"buildtype-release-o2",
+				"generator-ninja",
+				"compiler-clang-cl"
+			]
+		},
+		{
+			"name": "build-release-clang-od",
+			"inherits": [
+				"common",
+				"packaging-vcpkg",
+				"buildtype-release-od",
+				"generator-ninja",
+				"compiler-clang-cl"
+			]
+		}
+	],
+	"buildPresets": [
+		{
+			"name": "release-msvc-o2",
+			"configurePreset": "build-release-msvc-o2",
+			"configuration": "Release",
+			"displayName": "(Release) MSVC - MSVC [O2]"
+		},
+		{
+			"name": "release-msvc-od",
+			"configurePreset": "build-release-msvc-od",
+			"configuration": "Release",
+			"displayName": "(Release) MSVC - MSVC [Od]"
+		},
+		{
+			"name": "release-clang-o2",
+			"configurePreset": "build-release-clang-o2",
+			"configuration": "Release",
+			"displayName": "(Release) Ninja - ClangCL [O2]"
+		},
+		{
+			"name": "release-clang-od",
+			"configurePreset": "build-release-clang-od",
+			"configuration": "Release",
+			"displayName": "(Release) Ninja - ClangCL [Od]"
+		}
+	]
 }

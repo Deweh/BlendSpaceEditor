@@ -57,7 +57,7 @@ public:
     const std::function<int()> m_NextIdBound = std::bind(&Editor::GetNextId, this);
     std::vector<Node> m_Nodes;
     std::vector<Link> m_Links;
-    ImTextureID m_HeaderBackground = nullptr;
-    ImTextureID m_SaveIcon = nullptr;
-    ImTextureID m_RestoreIcon = nullptr;
+    ImTextureID m_HeaderBackground;
+    ImTextureID m_SaveIcon;
+    ImTextureID m_RestoreIcon;
 };

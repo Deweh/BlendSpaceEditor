@@ -8,7 +8,7 @@ namespace Util
 
     struct NodeBuilder
     {
-        NodeBuilder(ImTextureID texture = nullptr, int textureWidth = 0, int textureHeight = 0);
+        NodeBuilder(ImTextureID texture = {}, int textureWidth = 0, int textureHeight = 0);
 
         void Begin(ed::NodeId id);
         void End();

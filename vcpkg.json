@@ -3,15 +3,14 @@
   "name": "blendspaceeditor",
   "version-string": "1.0.0",
   "description": "-",
-  "builtin-baseline": "1de2026f28ead93ff1773e6e680387643e914ea1",
+  "builtin-baseline": "6f29f12e82a8293156836ad81cc9bf5af41fe836",
   "homepage": "https://github.com/Deweh/BlendSpaceEditor",
   "dependencies": [
     {
       "name": "imgui",
-      "features": [ "opengl3-binding", "win32-binding" ]
+      "features": [ "dx11-binding", "win32-binding" ]
     },
     "imgui-node-editor",
-    "opengl",
     "nlohmann-json"
   ]
 }
