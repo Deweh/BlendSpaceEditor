@@ -1,6 +1,5 @@
 #pragma once
 #include "NodeTypes.h"
-#include <span>
 #include <functional>
 
 namespace NodeDefinitions

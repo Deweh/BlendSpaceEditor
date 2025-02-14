@@ -18,13 +18,13 @@ add_executable (${PROJECT_NAME}
 
 find_package(unofficial-imgui-node-editor CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
-find_package(OpenGL REQUIRED)
+find_package(directxtk CONFIG REQUIRED)
 target_link_libraries(
   ${PROJECT_NAME}
   PRIVATE
     imgui::imgui
-    ${OPENGL_LIBRARIES}
     unofficial::imgui-node-editor::imgui-node-editor
+    Microsoft::DirectXTK
 )
 
 target_compile_options(

@@ -1,4 +1,5 @@
 ﻿#include "imgui.h"
+#include <directxtk/GeometricPrimitive.h>
 #ifndef WIN32_LEAN_AND_MEAN
 #	define WIN32_LEAN_AND_MEAN
 #endif
@@ -42,6 +43,7 @@ int main(int argc, char** argv)
 			continue;
 		}
 
+		renderer.RenderExtraTargets();
 		Main::OnFrame(io);
 		renderer.Present();
 	}

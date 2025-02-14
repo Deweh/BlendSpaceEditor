@@ -11,6 +11,7 @@
       "features": [ "dx11-binding", "win32-binding" ]
     },
     "imgui-node-editor",
-    "nlohmann-json"
+    "nlohmann-json",
+    "directxtk"
   ]
 }

@@ -15,7 +15,7 @@ namespace Main
     ImFont* g_mainFontMedium{ nullptr };
     std::string g_statusText{ "" };
     std::filesystem::path g_curPath{ L"" };
-    std::filesystem::path pendingOpenFile{ L"" };
+	std::filesystem::path pendingOpenFile{ L"" };
 
 	void OnStart(ImGuiIO& io)
 	{
@@ -27,7 +27,7 @@ namespace Main
         g_mainFont = ImGui_LoadWindowsFont("Arial", 22.0f, io);
         g_mainFontSmall = ImGui_LoadWindowsFont("Arial", 16.0f, io);
         g_mainFontMedium = ImGui_LoadWindowsFont("Arial", 18.5f, io);
-        g_mainEditor = std::make_unique<Editor>();
+		g_mainEditor = std::make_unique<Editor>();
 	}
 
 	void OnStop(ImGuiIO& io)
@@ -199,7 +199,7 @@ namespace Main
             g_curPath = pendingOpenFile;
             pendingOpenFile.clear();
             LoadData(g_curPath);
-        }
+		}
 
         if (ImGui::IsKeyDown(ImGuiKey_LeftCtrl)) {
             if (ImGui::IsKeyReleased(ImGuiKey_S, false)) {

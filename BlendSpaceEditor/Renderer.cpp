@@ -1,3 +1,5 @@
+#include <CommonStates.h>
+#include <d3d11.h>
 #include <memory>
 #pragma comment(lib, "d3d11.lib")
 #include "Main.h"
@@ -6,6 +8,43 @@
 #include "imgui_impl_dx11.h"
 #include "imgui_impl_win32.h"
 #include <tchar.h>
+
+bool Renderer::RenderTarget::Init(ID3D11Device* a_d3dDevice, std::uint32_t a_width, std::uint32_t a_height)
+{
+	D3D11_TEXTURE2D_DESC texDesc = {};
+	texDesc.Width = a_width;
+	texDesc.Height = a_height;
+	texDesc.MipLevels = 1;
+	texDesc.ArraySize = 1;
+	texDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	texDesc.SampleDesc.Count = 1;
+	texDesc.Usage = D3D11_USAGE_DEFAULT;
+	texDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+
+	HRESULT hr = a_d3dDevice->CreateTexture2D(&texDesc, nullptr, &texture);
+	if (FAILED(hr)) {
+		return false;
+	}
+
+    hr = a_d3dDevice->CreateRenderTargetView(texture.Get(), nullptr, &rtv);
+	if (FAILED(hr)) {
+		return false;
+    }
+
+	hr = a_d3dDevice->CreateShaderResourceView(texture.Get(), nullptr, &srv);
+	if (FAILED(hr)) {
+		return false;
+	}
+
+	width = a_width;
+	height = a_height;
+
+	return true;
+}
+
+void Renderer::RenderTarget::Render(ID3D11DeviceContext* a_d3dDeviceContext)
+{
+}
 
 Renderer& Renderer::GetSingleton()
 {
@@ -46,6 +85,13 @@ bool Renderer::Init(const wchar_t* a_windowTitle)
 	ImGui_ImplWin32_Init(mainHWND);
 	ImGui_ImplDX11_Init(d3dDevice, d3dDeviceContext);
 	return true;
+}
+
+void Renderer::RenderExtraTargets()
+{
+	for (auto& target : extraRenderTargets) {
+		target->Render(d3dDeviceContext);
+    }
 }
 
 bool Renderer::StartFrame()
@@ -109,6 +155,17 @@ void Renderer::Shutdown()
 void Renderer::SetUseVSync(bool a_use)
 {
 	syncInterval = a_use ? 1 : 0;
+}
+
+Renderer::RenderTarget* Renderer::CreateExtraRenderTarget(std::unique_ptr<RenderTarget> a_base, std::uint32_t a_width, std::uint32_t a_height)
+{
+	if (!a_base->Init(d3dDevice, a_width, a_height)) {
+		return nullptr;
+	}
+	
+	RenderTarget* result = a_base.get();
+	extraRenderTargets.emplace_back(std::move(a_base));
+    return result;
 }
 
 // Helper functions
