@@ -1,12 +1,11 @@
 #include <memory>
 #pragma comment(lib, "d3d11.lib")
-#include "Renderer.h"
 #include "Main.h"
+#include "Renderer.h"
 #include "imgui.h"
 #include "imgui_impl_dx11.h"
 #include "imgui_impl_win32.h"
 #include <tchar.h>
-
 
 Renderer& Renderer::GetSingleton()
 {
@@ -73,12 +72,12 @@ bool Renderer::StartFrame()
 	ImGui::NewFrame();
 
 	const ImVec2& displaySize = io->DisplaySize;
-	if(displaySize.x < 1.0f || displaySize.y < 1.0f) {
+	if (displaySize.x < 1.0f || displaySize.y < 1.0f) {
 		Present();
 		return false;
 	} else {
 		return true;
-    }
+	}
 }
 
 void Renderer::Present()
@@ -91,8 +90,7 @@ void Renderer::Present()
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
 	// Present
-	HRESULT hr = swapChain->Present(1, 0);  // Present with vsync
-	//HRESULT hr = g_pSwapChain->Present(0, 0); // Present without vsync
+	HRESULT hr = swapChain->Present(syncInterval, 0); 
 	swapChainOccluded = (hr == DXGI_STATUS_OCCLUDED);
 }
 
@@ -106,6 +104,11 @@ void Renderer::Shutdown()
 	CleanupDeviceD3D();
 	::DestroyWindow(mainHWND);
 	::UnregisterClassW(wc.lpszClassName, wc.hInstance);
+}
+
+void Renderer::SetUseVSync(bool a_use)
+{
+	syncInterval = a_use ? 1 : 0;
 }
 
 // Helper functions

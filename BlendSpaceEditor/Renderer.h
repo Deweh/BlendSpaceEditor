@@ -11,16 +11,18 @@ public:
 	bool StartFrame();
 	void Present();
 	void Shutdown();
+	void SetUseVSync(bool a_use);
 
 	ImVec4 clearColor;
 	HWND mainHWND;
 	WNDCLASSEXW wc;
 	ImGuiIO* io;
-	
+	std::uint32_t syncInterval = 1;
+
 	ID3D11Device* d3dDevice = nullptr;
-    ID3D11DeviceContext* d3dDeviceContext = nullptr;
-    IDXGISwapChain* swapChain = nullptr;
-    bool swapChainOccluded = false;
+	ID3D11DeviceContext* d3dDeviceContext = nullptr;
+	IDXGISwapChain* swapChain = nullptr;
+	bool swapChainOccluded = false;
 	std::uint32_t resizeWidth = 0;
 	std::uint32_t resizeHeight = 0;
 	ID3D11RenderTargetView* mainRenderTargetView = nullptr;
